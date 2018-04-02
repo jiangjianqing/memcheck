@@ -10,7 +10,6 @@
 */
 
 #include "memglobal.h"
-#include "checkmem.h"
 
 using namespace std;
 
@@ -22,18 +21,20 @@ int main(int argc, char *argv[]) {
             Tutorial_VERSION_MINOR);
 
     // 实验步骤是, 是申请内存, 在操作内存
-        char* as = (char*)mc_malloc(16);
+        char* as = (char*)malloc(16);
 
-        mc_check(as);
+        //mg_check(as);
 
         // 内存越界了
-        //as[16] = 18;
-        //mc_check(as);
+        char a = as[16];
+        as[16] = 18;
+        char b = as[16];
+        mg_check(as);
 
         // 重新分配内存, 再次越界
         //as = (char*)mc_realloc(as, 15);
         //as[15] = 44;
-        mc_check(as);
+        //mg_check(as);
 
         free(as);
 

@@ -11,6 +11,8 @@
  */
 extern void mg_start(void);
 
+extern void mg_check(void* ptr);
+
 /*
  * 增加的全局计数的 malloc
  * sz        : 待分配内存大小

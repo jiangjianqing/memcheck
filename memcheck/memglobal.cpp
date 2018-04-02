@@ -15,9 +15,21 @@
 #undef free
 
 // 控制台打印错误信息, fmt必须是双引号括起来的宏
-#define IOERR(io, fmt, ...) \
-    fprintf(io,"[%s:%s:%d][error %d:%s]" fmt "\r\n",\
+#define IOERR(io,fmt, ...) \
+    fprintf(io,"[%s:%s:%d][error %d:%s]"  fmt  "\r\n",\
          __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__)
+
+// 控制台打印错误信息, fmt必须是双引号括起来的宏
+#define CERR(fmt, ...) \
+    fprintf(stderr,"[%s:%s:%d][error %d:%s]"  fmt  "\r\n",\
+         __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__)
+//控制台打印错误信息并退出, t同样fmt必须是 ""括起来的字符串常量
+#define CERR_EXIT(fmt,...) \
+    CERR(fmt,##__VA_ARGS__),exit(EXIT_FAILURE)
+
+
+// 插入字节块的个数
+#define _INT_CHECK        (1<<4)
 
 // 全局内存计数, 系统第一次构造的时候为0
 static int _mct;
@@ -50,20 +62,28 @@ void mg_start(void) {
 }
 
 /*
-* 增加的全局计数的 malloc
-* sz        : 待分配内存大小
-*            : 返回分配的内存首地址
+ *对malloc进行的封装, 添加了边界检测内存块,增加的全局计数的 malloc
+* sz        : 申请内存长度
+*            : 返回得到的内存首地址
 */
-void* mg_malloc(size_t sz) {
-    void* ptr = malloc(sz);
-    if (!ptr) return NULL;
+void* mg_malloc(size_t sz) {   
+    // 头和尾都加内存检测块, 默认0x00
+    int head_size = 2 * _INT_CHECK;
+    void* ptr = calloc(1, sz + 2 * _INT_CHECK);
+    if (NULL == ptr) {
+        CERR_EXIT("malloc sz + sizeof struct check is error!");
+    }
     ++_mct;
-    memset(ptr, 0x00, sz);
-    return ptr;
+    //前四个字节保存 最后一个内存块地址 大小
+    size_t* iptr = (size_t*)ptr;
+    *iptr = sz + _INT_CHECK;
+
+    void* ptr_ret = ptr + _INT_CHECK;
+    return ptr_ret;
 }
 
 /*
-* 增加了全局计数的 calloc
+* 对calloc进行封装, 添加边界检测内存块,增加了全局计数的 calloc
 * sc        : 分配的个数
 * sz        : 每个分配大小
 *            : 返回分配内存的首地址
@@ -71,6 +91,38 @@ void* mg_malloc(size_t sz) {
 void* mg_calloc(size_t sc, size_t sz) {
     return mg_malloc(sc*sz);
 }
+
+// 检测内存是否错误, 错误返回 true, 在控制台打印信息
+static void _iserror(char* s, char* e) {
+    while (s < e) {
+        char a = *s;
+        char b = *e;
+        if (*s) {
+            CERR_EXIT("Need to debug test!!! ptr is : (%p, %p).check is %d!",s, e, *s);
+        }
+        ++s;
+    }
+}
+
+/*
+* 对内存检测, 看是否出错, 出错直接打印错误信息
+* 只能检测, check_* 得到的内存
+*/
+void mg_check(void* ptr) {
+    char *sptr = (char*)ptr - _INT_CHECK;
+
+    //先检测头部
+    char* s = sptr + sizeof(size_t);
+    char* e = sptr + _INT_CHECK;
+    _iserror(s, e);
+
+    //后检测尾部
+    size_t sz = *(size_t*)sptr;
+    s = sptr + sz;
+    e = s + _INT_CHECK;
+    _iserror(s, e);
+}
+
 
 /*
 * 增加了计数的 realloc
@@ -81,6 +133,22 @@ void* mg_calloc(size_t sc, size_t sz) {
 void* mg_realloc(void* ptr, size_t sz) {
     if (!ptr) return mg_malloc(sz);
     return realloc(ptr, sz);
+
+    // 先检测一下内存
+    mg_check(ptr);
+
+    // 重新申请内存
+    char* cptr = (char*)ptr - _INT_CHECK;
+    void* nptr = mg_malloc(sz) - _INT_CHECK;
+    if (NULL == nptr) {
+        CERR_EXIT("realloc is error:%p.", ptr);
+    }
+    // 旧数据复制
+    size_t* bsz = (size_t*)cptr;//第一个字节为数据长度
+    memcpy(nptr + _INT_CHECK, cptr + _INT_CHECK, *bsz < sz ? *bsz : sz);
+
+    free(cptr);
+    return nptr;
 }
 
 /*
@@ -90,5 +158,5 @@ void* mg_realloc(void* ptr, size_t sz) {
 void mg_free(void* ptr) {
     if (!ptr) return;
     --_mct;
-    free(ptr);
+    free(ptr - _INT_CHECK);
 }
