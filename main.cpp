@@ -27,12 +27,12 @@ int main(int argc, char *argv[]) {
         mc_check(as);
 
         // 内存越界了
-        as[16] = 18;
-        mc_check(as);
+        //as[16] = 18;
+        //mc_check(as);
 
         // 重新分配内存, 再次越界
-        as = (char*)mc_realloc(as, 15);
-        as[15] = 44;
+        //as = (char*)mc_realloc(as, 15);
+        //as[15] = 44;
         mc_check(as);
 
         free(as);

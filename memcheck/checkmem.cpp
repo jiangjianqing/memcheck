@@ -6,12 +6,12 @@
 
 // 控制台打印错误信息, fmt必须是双引号括起来的宏
 #define CERR(fmt, ...) \
-    fprintf(stderr,"[%s:%s:%d][error %d:%s]" fmt "\r\n",\
-         __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__)
+    fprintf(stderr,"[%s:%s:%d][error %d:%s]" + fmt + "\r\n",\
+         __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__);
 
 //控制台打印错误信息并退出, t同样fmt必须是 ""括起来的字符串常量
 #define CERR_EXIT(fmt,...) \
-    CERR(fmt,##__VA_ARGS__),exit(EXIT_FAILURE);
+    CERR(fmt,##__VA_ARGS__ ),exit(EXIT_FAILURE)
 
 
 // 插入字节块的个数
