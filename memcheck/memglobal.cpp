@@ -131,8 +131,8 @@ void mg_check(void* ptr) {
 *            : 返回重新分配好的内存地址
 */
 void* mg_realloc(void* ptr, size_t sz) {
-    if (!ptr) return mg_malloc(sz);
-    return realloc(ptr, sz);
+    if (!ptr)
+        return mg_malloc(sz);
 
     // 先检测一下内存
     mg_check(ptr);
@@ -145,7 +145,7 @@ void* mg_realloc(void* ptr, size_t sz) {
     }
     // 旧数据复制
     size_t* bsz = (size_t*)cptr;//第一个字节为数据长度
-    memcpy(nptr + _INT_CHECK, cptr + _INT_CHECK, *bsz < sz ? *bsz : sz);
+    memcpy(nptr, ptr, *bsz < sz ? *bsz : sz);
 
     free(cptr);
     return nptr;

@@ -56,5 +56,4 @@ extern void mg_free(void* ptr);
 #endif
 
 
-
 #endif // MEMGLOBAL_H

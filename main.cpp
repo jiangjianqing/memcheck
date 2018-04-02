@@ -15,6 +15,8 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
+    mg_start();//注册退出检查函数
+
     fprintf(stdout,"%s Version %d.%d\n",
             argv[0],
             Tutorial_VERSION_MAJOR,
@@ -26,10 +28,10 @@ int main(int argc, char *argv[]) {
         //mg_check(as);
 
         // 内存越界了
-        char a = as[16];
-        as[16] = 18;
-        char b = as[16];
-        mg_check(as);
+        //char a = as[16];
+        //as[16] = 18;
+        //char b = as[16];
+        //mg_check(as);
 
         // 重新分配内存, 再次越界
         //as = (char*)mc_realloc(as, 15);
@@ -39,17 +41,20 @@ int main(int argc, char *argv[]) {
         free(as);
 
     // 开启内存全局计数
-        mg_start();
-        //mg_free(0);
+
 
         int* p = (int*)malloc(16);
+        free(p);
 
-        p = (int*)calloc(12, 2);
+        p = (int*)calloc(12, sizeof(int));
         *p = 154;
 
         puts("就这样!");
 
-        p = (int*)realloc(NULL, 6);
+        p = (int*)realloc(p, 6*sizeof(int));
+        int y = *p;
+        //p = (int*)realloc(NULL, 6);
+        //free(p);
         puts("测试这样行!");
 
 
