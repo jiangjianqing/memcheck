@@ -35,8 +35,8 @@ configure_file (
 #
 if (USE_MYMATH)
   include_directories ("${PROJECT_SOURCE_DIR}/memcheck")
-  #add_subdirectory (memcheck)
-  #set (EXTRA_LIBS ${EXTRA_LIBS} memcheck)
+  add_subdirectory (memcheck)
+  set (EXTRA_LIBS ${EXTRA_LIBS} memcheck)
 endif (USE_MYMATH)
 
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)        #用IF控制，可以实现Release版本不输出debug信息
@@ -49,7 +49,7 @@ include_directories("${PROJECT_BINARY_DIR}")
  
 # add the executable
 
-add_executable (${TARGET} main.cpp memcheck/memglobal.cpp)
+add_executable (${TARGET} main.cpp)
 
 target_link_libraries (${TARGET} ${EXTRA_LIBS})
 
