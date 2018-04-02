@@ -38,7 +38,7 @@ extern void* mg_realloc(void* ptr, size_t sz);
  * 增加了计数处理的内存 free
  * ptr        : 上面函数返回地址的指针
  */
-extern inline void mg_free(void* ptr);
+extern void mg_free(void* ptr);
 
 // 在测试模式下开启 全局内存使用计数
 #if defined(_DEBUG)

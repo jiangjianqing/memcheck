@@ -12,6 +12,7 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 SET(LIB_SRC 
     #	mysqrt.cxx ${CMAKE_CURRENT_BINARY_DIR}/Table.h
     memglobal.h memglobal.cpp
+    checkmem.h checkmem.cpp
 )  
 
 #设置字符集  

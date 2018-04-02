@@ -87,7 +87,7 @@ void* mg_realloc(void* ptr, size_t sz) {
 * 增加了计数处理的内存 free
 * ptr        : 上面函数返回地址的指针
 */
-inline void mg_free(void* ptr) {
+void mg_free(void* ptr) {
     if (!ptr) return;
     --_mct;
     free(ptr);
