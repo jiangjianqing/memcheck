@@ -4,13 +4,18 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 #注意：加入${PROJECT_BINARY_DIR}是为了mysqrt.cxx能够引入TutorialConfig.h
 include_directories("${PROJECT_BINARY_DIR}")
 
+
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)        #用IF控制，可以实现Release版本不输出debug信息
     ADD_DEFINITIONS(-D_DEBUG)
 ENDIF()
 
-#ADD_DEFINITIONS("-DLIBHELLO_BUILD")  
-#修改库的编译输出位置,由于是动态库，所以需要将dll放到Project目录中
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})  
+IF (WIN32)
+    #ADD_DEFINITIONS("-DLIBHELLO_BUILD")
+    #修改库的编译输出位置,由于是动态库，所以需要将dll放到Project目录中
+    SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+ELSE()
+    SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+ENDIF()
 
 SET(LIB_SRC 
     #	mysqrt.cxx ${CMAKE_CURRENT_BINARY_DIR}/Table.h
