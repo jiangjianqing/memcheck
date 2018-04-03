@@ -5,10 +5,6 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
 
-IF (CMAKE_BUILD_TYPE STREQUAL Debug)        #用IF控制，可以实现Release版本不输出debug信息
-    ADD_DEFINITIONS(-D_DEBUG)
-ENDIF()
-
 IF (WIN32)
     #ADD_DEFINITIONS("-DLIBHELLO_BUILD")
     #修改库的编译输出位置,由于是动态库，所以需要将dll放到Project目录中
@@ -21,9 +17,6 @@ SET(LIB_SRC
     #	mysqrt.cxx ${CMAKE_CURRENT_BINARY_DIR}/Table.h
     memglobal.h memglobal.cpp
 )  
-
-#设置字符集  
-add_definitions(-DUNICODE -D_UNICODE) 
 
 #搜索目录下的文件名并存入变量（可能会放入多余文件名）
 #aux_source_directory(. LIB_SRC)

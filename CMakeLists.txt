@@ -14,6 +14,56 @@ option (USE_MYMATH "Use tutorial provided math implementation" ON)
 #option(BUILD_USE_64BITS "Compile for 64bits processors" ON)
 
 #------------------------------check section---------------------------------
+
+option(CMAKE_ENCODING_UTF8 "Use UTF-8 encoding internally (experimental)." ON)
+mark_as_advanced(CMAKE_ENCODING_UTF8)
+if(CMAKE_ENCODING_UTF8)
+  set(KWSYS_ENCODING_DEFAULT_CODEPAGE CP_UTF8)
+endif()
+
+if(WIN32 AND KWSYS_ENCODING_DEFAULT_CODEPAGE MATCHES CP_UTF8)
+  add_definitions(-DKWSYS_CP_UTF8)
+  message(STATUS "注意: vc 编译器UTF-8")
+endif()
+
+
+#---------------------------重要设置区--------------------------------------
+
+#设置字符集
+add_definitions(-DUNICODE -D_UNICODE)
+message(STATUS "设置字符集为 UNICODE . ")
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX14)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER}  support C++14 . ")
+elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+    #如果是vc编译器，可能不准确
+    IF (NOT MSVC)
+        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
+    ELSE()
+        #add_compile_options命令添加的编译选项是针对所有编译器的(包括c和c++编译器)，而set命令设置CMAKE_C_FLAGS或CMAKE_CXX_FLAGS变量则是分别只针对c和c++编译器的。
+        #举一反三，我们就可以想到，add_definitions这个命令也是同样针对所有编译器
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+        message(STATUS " 注意: QT Creator 对vc 编译器检查 c++特性的结果可能不正确")
+    ENDIF ()
+endif()
+
+IF (MSVC)
+    message(STATUS "极其重要的发现：VC默认情况下需要每个源码文件设置为UTF-8 with signature，vs2015update2之后可以加入-source-charset:utf-8标志修改")
+    add_compile_options(-source-charset:utf-8)
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -source-charset:utf-8")
+endif()
+
+IF (CMAKE_BUILD_TYPE STREQUAL Debug)        #用IF控制，可以实现Release版本不输出debug信息
+    ADD_DEFINITIONS(-D_DEBUG -DDEBUG)
+ENDIF()
+
+
 # does this system provide the log and exp functions?
 #include (CheckFunctionExists)
 #引用module
@@ -38,10 +88,6 @@ if (USE_MYMATH)
   add_subdirectory (memcheck)
   set (EXTRA_LIBS ${EXTRA_LIBS} memcheck)
 endif (USE_MYMATH)
-
-IF (CMAKE_BUILD_TYPE STREQUAL Debug)        #用IF控制，可以实现Release版本不输出debug信息
-    ADD_DEFINITIONS(-D_DEBUG)
-ENDIF()
  
 # add the binary tree to the search path for include files
 # so that we will find TutorialConfig.h

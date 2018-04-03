@@ -2,6 +2,7 @@
 #include <stdio.h>  //for fprintf stdout
 #include <stdlib.h> //for atof
 #include "TutorialConfig.h"
+#include "debugoutput.h"
 
 /*
 #ifdef USE_MYMATH
@@ -21,6 +22,7 @@ int main(int argc, char *argv[]) {
             argv[0],
             Tutorial_VERSION_MAJOR,
             Tutorial_VERSION_MINOR);
+	DEBUG("中文测试 %d", 123);
 
     // 实验步骤是, 是申请内存, 在操作内存
         char* as = (char*)malloc(16);
