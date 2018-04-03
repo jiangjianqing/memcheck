@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-set (TARGET MemCheck)
+set (TARGET MemCheck-Demo)
 project (${TARGET})
 
 # The version number.

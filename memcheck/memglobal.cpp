@@ -3,8 +3,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
-
 
 //这个主要为了解决 引用了 头文件 memglobal.h 会造成递归调用. Linux上还有一种思路, 不包含这个头文件
 //链接时候gcc 指定就可以.  但是 vs 是自动推导编译, 如果不引入它推导不出来. 后面就采用了上面通用的做法.
@@ -15,18 +13,48 @@
 #undef realloc
 #undef free
 
+#ifdef WIN32
+//为了能够在Windows下的QT输出窗口显示调试信息，使用OutputDebugStringA
+#include <Windows.h>
+#endif
+
 // 控制台打印错误信息, fmt必须是双引号括起来的宏
+#ifdef WIN32
+#define IOERR(io,fmt, ...) \
+{\
+    char info[MAX_PATH];\
+    sprintf(info,"[%s:%s:%d][error %d:%s]" fmt "\r\n",\
+    __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__);\
+    OutputDebugStringA(info);    \
+}
+#else
 #define IOERR(io,fmt, ...) \
     fprintf(io,"[%s:%s:%d][error %d:%s]"  fmt  "\r\n",\
-         __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__)
+     __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__);\
 
+#endif
+
+#ifdef WIN32
+#define CERR(fmt, ...) \
+{\
+    char info[MAX_PATH];\
+    sprintf(info,"[%s:%s:%d][error %d:%s]" fmt "\r\n",\
+    __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__);\
+    OutputDebugStringA(info);    \
+}
+#else
 // 控制台打印错误信息, fmt必须是双引号括起来的宏
 #define CERR(fmt, ...) \
     fprintf(stderr,"[%s:%s:%d][error %d:%s]"  fmt  "\r\n",\
          __FILE__, __func__, __LINE__, errno, strerror(errno), ##__VA_ARGS__)
+#endif
+
+
+
 //控制台打印错误信息并退出, t同样fmt必须是 ""括起来的字符串常量
 #define CERR_EXIT(fmt,...) \
-    CERR(fmt,##__VA_ARGS__),exit(EXIT_FAILURE)
+    CERR(fmt,##__VA_ARGS__);        \
+    exit(EXIT_FAILURE);     \
 
 
 // 插入字节块的个数
@@ -69,7 +97,6 @@ void mg_start(void) {
 */
 void* mg_malloc(size_t sz) {   
     // 头和尾都加内存检测块, 默认0x00
-    assert(1==0);
     int head_size = 2 * _INT_CHECK;
     char* ptr = (char*)calloc(1, sz + 2 * _INT_CHECK);
     if (NULL == ptr) {
