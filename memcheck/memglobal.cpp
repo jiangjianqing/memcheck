@@ -15,8 +15,28 @@
 #include <stdlib.h>
 
 
-//通用调试信息输出库
 #include "DebugOutput.h"
+
+#ifdef WIN32
+//模拟linux下的getpagesize,获取每个页面大小
+
+//通用调试信息输出库
+size_t getpagesize(void)
+{
+    static size_t sz = 0;
+    if(sz > 0){//提升执行效率
+        return sz;
+    }
+    SYSTEM_INFO sysInfo;
+    ::ZeroMemory( &sysInfo, sizeof( SYSTEM_INFO ) );
+    ::GetSystemInfo( &sysInfo );
+    sz = sysInfo.dwPageSize;
+    return sz;
+}
+#else
+#include <unistd.h>
+#endif
+
 
 
 // 插入字节块的个数
@@ -59,7 +79,7 @@ void mg_start(void) {
 */
 void* mg_malloc(size_t sz) {   
     // 头和尾都加内存检测块, 默认0x00
-    int head_size = 2 * _INT_CHECK;
+    int head_size = _INT_CHECK;
     char* ptr = (char*)calloc(1, sz + 2 * _INT_CHECK);
     if (NULL == ptr) {
         CERR_EXIT("malloc sz + sizeof struct check is error!");
@@ -68,6 +88,24 @@ void* mg_malloc(size_t sz) {
     //前四个字节保存 最后一个内存块地址 大小
     size_t* iptr = (size_t*)ptr;
     *iptr = sz + _INT_CHECK;
+
+#ifdef WIN32
+    //Memory Protection Constants
+    //https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx
+    DWORD oldFlag;
+    void* dataPtr = (void*)ptr;
+    void* tailPtr = ptr + _INT_CHECK + sz;
+    //修改页都保护属性
+    DWORD dwOldProtect;
+    MEMORY_BASIC_INFORMATION mbi;
+    VirtualQuery(tailPtr, &mbi, sizeof(mbi));
+    int i = getpagesize();
+    //VirtualProtectEx(GetCurrentProcess(), lpAddr, sizeof(DWORD), PAGE_READWRITE, &dwOldProtect)
+    if (VirtualProtect(tailPtr,_INT_CHECK,PAGE_READONLY,&oldFlag)){
+        int i = 0;
+        i =i + 1;
+    }
+#endif
 
     void* ptr_ret = ptr + _INT_CHECK;
     return ptr_ret;
