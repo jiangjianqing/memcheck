@@ -69,7 +69,7 @@ void mg_start(void) {
 void* mg_malloc(size_t sz) {   
     // 头和尾都加内存检测块, 默认0x00
     int head_size = 2 * _INT_CHECK;
-    void* ptr = calloc(1, sz + 2 * _INT_CHECK);
+    char* ptr = (char*)calloc(1, sz + 2 * _INT_CHECK);
     if (NULL == ptr) {
         CERR_EXIT("malloc sz + sizeof struct check is error!");
     }
@@ -139,7 +139,7 @@ void* mg_realloc(void* ptr, size_t sz) {
 
     // 重新申请内存
     char* cptr = (char*)ptr - _INT_CHECK;
-    void* nptr = mg_malloc(sz) - _INT_CHECK;
+    void* nptr = (char*)mg_malloc(sz) - _INT_CHECK;
     if (NULL == nptr) {
         CERR_EXIT("realloc is error:%p.", ptr);
     }
@@ -158,5 +158,5 @@ void* mg_realloc(void* ptr, size_t sz) {
 void mg_free(void* ptr) {
     if (!ptr) return;
     --_mct;
-    free(ptr - _INT_CHECK);
+    free((char*)ptr - _INT_CHECK);
 }
