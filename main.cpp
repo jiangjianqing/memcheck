@@ -2,7 +2,7 @@
 #include <stdio.h>  //for fprintf stdout
 #include <stdlib.h> //for atof
 #include "TutorialConfig.h"
-#include "debugoutput.h"
+#include "DebugOutput.h"
 
 /*
 #ifdef USE_MYMATH

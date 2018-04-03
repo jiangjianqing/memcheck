@@ -1,6 +1,11 @@
 ﻿#ifndef DEBUGOUTPUT_H
 #define DEBUGOUTPUT_H
 
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+
 #ifdef WIN32
 //为了能够在Windows下的QT输出窗口显示调试信息，使用OutputDebugStringA
 #include <Windows.h>

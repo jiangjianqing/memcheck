@@ -9,11 +9,6 @@
 #undef realloc
 #undef free
 
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-
 
 #include "DebugOutput.h"
 
@@ -89,6 +84,7 @@ void* mg_malloc(size_t sz) {
     size_t* iptr = (size_t*)ptr;
     *iptr = sz + _INT_CHECK;
 
+    int pageSize = getpagesize();
 #ifdef WIN32
     //Memory Protection Constants
     //https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx
@@ -99,7 +95,7 @@ void* mg_malloc(size_t sz) {
     DWORD dwOldProtect;
     MEMORY_BASIC_INFORMATION mbi;
     VirtualQuery(tailPtr, &mbi, sizeof(mbi));
-    int i = getpagesize();
+
     //VirtualProtectEx(GetCurrentProcess(), lpAddr, sizeof(DWORD), PAGE_READWRITE, &dwOldProtect)
     //VirtualProtect 的第二个参数 dwSize 无论设置再小最低也是最低修改一个页（4k）的属性
     /*
