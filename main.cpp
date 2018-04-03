@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
         //mg_check(as);
 
         // 内存越界了
-        char a = as[14];
-        as[1] = 18;
+        char a = as[16];
+        as[16] = 18;
         char b = as[16];
         mg_check(as);
 

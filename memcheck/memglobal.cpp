@@ -101,10 +101,13 @@ void* mg_malloc(size_t sz) {
     VirtualQuery(tailPtr, &mbi, sizeof(mbi));
     int i = getpagesize();
     //VirtualProtectEx(GetCurrentProcess(), lpAddr, sizeof(DWORD), PAGE_READWRITE, &dwOldProtect)
+    //VirtualProtect 的第二个参数 dwSize 无论设置再小最低也是最低修改一个页（4k）的属性
+    /*
     if (VirtualProtect(tailPtr,_INT_CHECK,PAGE_READONLY,&oldFlag)){
         int i = 0;
         i =i + 1;
     }
+    */
 #endif
 
     void* ptr_ret = ptr + _INT_CHECK;
