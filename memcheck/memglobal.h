@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #ifdef WIN32
-//当在windows下编译时，会自动生成${LIBRARY_NAME}_EXPORTS的定义
+//当在windows下编译时，会自动生成${PROJECT_NAME}_EXPORT的定义
     #ifdef memcheck_EXPORT
     #define DLLAPI __declspec(dllexport)
     #else
