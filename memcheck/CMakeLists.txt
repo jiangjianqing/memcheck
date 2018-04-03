@@ -4,7 +4,6 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 #注意：加入${PROJECT_BINARY_DIR}是为了mysqrt.cxx能够引入TutorialConfig.h
 include_directories("${PROJECT_BINARY_DIR}")
 
-
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)        #用IF控制，可以实现Release版本不输出debug信息
     ADD_DEFINITIONS(-D_DEBUG)
 ENDIF()

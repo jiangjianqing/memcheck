@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 
 //这个主要为了解决 引用了 头文件 memglobal.h 会造成递归调用. Linux上还有一种思路, 不包含这个头文件
@@ -68,6 +69,7 @@ void mg_start(void) {
 */
 void* mg_malloc(size_t sz) {   
     // 头和尾都加内存检测块, 默认0x00
+    assert(1==0);
     int head_size = 2 * _INT_CHECK;
     char* ptr = (char*)calloc(1, sz + 2 * _INT_CHECK);
     if (NULL == ptr) {

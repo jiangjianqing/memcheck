@@ -53,6 +53,9 @@ DLLAPI void* mg_realloc(void* ptr, size_t sz);
  */
 DLLAPI void mg_free(void* ptr);
 
+
+#endif // MEMGLOBAL_H
+
 // 在测试模式下开启 全局内存使用计数
 #if defined(_DEBUG)
 #    define malloc        mg_malloc
@@ -65,6 +68,3 @@ DLLAPI void mg_free(void* ptr);
 #    define realloc        realloc
 #    define free            free
 #endif
-
-
-#endif // MEMGLOBAL_H
